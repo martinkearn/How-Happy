@@ -5,6 +5,7 @@
   },
 
   "dependencies": {
+    "ImageResizer": "4.0.5",
     "Microsoft.AspNet.Diagnostics": "1.0.0-rc1-final",
     "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
     "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
@@ -31,8 +32,7 @@
         "Microsoft.Net.Http": "2.2.22",
         "System.Net.Http": "4.0.1-beta-23516"
       }
-    },
-    "dnxcore50": { }
+    }
   },
 
   "exclude": [

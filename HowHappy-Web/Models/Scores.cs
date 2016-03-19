@@ -15,5 +15,14 @@ namespace HowHappy_Web.Models
         public double neutral { get; set; }
         public double sadness { get; set; }
         public double surprise { get; set; }
+
+        public double angerDisplay { get; set; }
+        public double contemptDisplay { get; set; }
+        public double disgustDisplay { get; set; }
+        public double fearDisplay { get; set; }
+        public double happinessDisplay { get; set; }
+        public double neutralDisplay { get; set; }
+        public double sadnessDisplay { get; set; }
+        public double surpriseDisplay { get; set; }
     }
 }

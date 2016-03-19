@@ -1,35 +1,75 @@
 ﻿@model HowHappy_Web.ViewModels.ResultViewModel
-
-<style>
-    #cont {
-        position: relative;
-        margin-top: 30px;
-        margin-left: 30px
-    }
-
-    .rect {
-        position: absolute;
-        border-color: white;
-        border-style: solid;
-        border-width: 5px;
-    }
-
-    .rank {
-        position: absolute;
-        color: white;
-        font-size: 3rem;
-        width: 250px;
-    }
-
-
-</style>
-<div  id="cont">
-    <img  src="@Model.ImagePath" />
-    @foreach (var face in Model.Faces)
-    {
-        <div class="rect" style="left:@(string.Format(face.Face.faceRectangle.left + "px;")); top:@(string.Format(face.Face.faceRectangle.top + "px;")); width:@(string.Format(face.Face.faceRectangle.width + "px;")); height:@(string.Format(face.Face.faceRectangle.height + "px;"));"></div>
-        <div class="rank" style="left:@(string.Format(face.Face.faceRectangle.left + "px;")); top:@(string.Format((face.Face.faceRectangle.top - 30) + "px;"));">#@face.Position @face.Comment</div>
-    }
+@{
+    ViewData["Title"] = "Who is the happiest?";
+}
+<div class="row">
+    <div class="col-md-12">
+        <h1>Who was the happiest?</h1>
+        <p>We found <strong>@Model.Faces.Count</strong> faces</p>
+        <i id="spinner" class="fa fa-circle-o-notch fa-spin fa-5x"></i>
+        <div id="cont">
+            <div id="draggable">
+                <img src="@Model.ImagePath" alt="A photo of faces" />
+                @foreach (var face in Model.Faces)
+                {
+                    <style type="text/css">
+                    #rect-@Model.Faces.IndexOf(face)
+                    {
+                        left:@(string.Format(face.faceRectangle.left + "px;"));
+                        top:@(string.Format(face.faceRectangle.top + "px;"));
+                        width:@(string.Format(face.faceRectangle.width + "px;"));
+                        height:@(string.Format(face.faceRectangle.height + "px;"));
+                    }
+                    #rank-@Model.Faces.IndexOf(face)
+                    {
+                        left:@(string.Format(face.faceRectangle.left + "px;"));
+                        top:@(string.Format((face.faceRectangle.top - 35) + "px;"));
+                    }
+                    #detail-@Model.Faces.IndexOf(face)
+                    {
+                        left:@(string.Format(face.faceRectangle.left + face.faceRectangle.width + "px;"));
+                        top:@(string.Format((face.faceRectangle.top) + "px;"));
+                    }
+                    </style>
+                    <div id="rect-@Model.Faces.IndexOf(face)" class="rect" data-toggle="popover" data-html="true" data-trigger="click" title="How are you feeling?" data-content="Happiness: @face.scores.happinessDisplay<br>Fear: @face.scores.fearDisplay<br>Anger: @face.scores.angerDisplay<br>Contempt: @face.scores.contemptDisplay<br>Disgust: @face.scores.disgustDisplay<br>Neutral: @face.scores.neutralDisplay<br>Sadness: @face.scores.sadnessDisplay<br>Surprise: @face.scores.surpriseDisplay"></div>
+                    <div id="rank-@Model.Faces.IndexOf(face)" class="rank">#@(Model.Faces.IndexOf(face) + 1)</div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts{
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script>
+        $(function () {
+            //TO DO: something that only enables this if the image is bigger than the viewport
+            $("#draggable").draggable({
+                cursor: "move",
+                scroll: true
+            });
+        });
+
+        $(document).ready(function () {
+            resizeDiv();
+            $('#spinner').css({ 'display': 'none' });
+        });
+
+        window.onresize = function (event) {
+            resizeDiv();
+        }
+
+        function resizeDiv() {
+            vpw = $(window).width();
+            vph = $(window).height();
+            $('#cont').css({ 'height': vph - 170 + 'px' });
+            $('#cont').css({ 'width': vpw - 50 + 'px' });
+        }
+
+    </script>
+}
+
+
+
 
 
