@@ -21,7 +21,7 @@ namespace HowHappy_Web.Controllers
     public class HomeController : Controller
     {
         //_apiKey: Replace this with your own Project Oxford Emotion API key, please do not use my key. I include it here so you can get up and running quickly but you can get your own key for free at https://www.projectoxford.ai/emotion 
-        public const string _apiKey = "63841eddbdec4532b518a7b38ca73513";
+        public const string _apiKey = "1dd1f4e23a5743139399788aa30a7153";
 
         //_apiUrl: The base URL for the API. Find out what this is for other APIs via the API documentation
         public const string _apiUrl = "https://api.projectoxford.ai/emotion/v1.0/recognize";
