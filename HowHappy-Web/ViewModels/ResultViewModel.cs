@@ -8,8 +8,12 @@ namespace HowHappy_Web.ViewModels
 {
     public class ResultViewModel
     {
+        public string HappinessSummary { get; set; }
+
         public  List<Face> Faces { get; set; }
 
         public string ImagePath { get; set; }
+
+        public string DateTaken { get; set; }
     }
 }

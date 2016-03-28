@@ -12,21 +12,31 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using ExifLib;
+using Microsoft.Extensions.OptionsModel;
+using HowHappy_Web.Logic;
 
 namespace HowHappy_Web.Controllers
 {
     public class HomeController : Controller
     {
         //_apiKey: Replace this with your own Project Oxford Emotion API key, please do not use my key. I include it here so you can get up and running quickly but you can get your own key for free at https://www.projectoxford.ai/emotion 
-        public const string _apiKey = "1dd1f4e23a5743139399788aa30a7153";
+        public const string _apiKey = "63841eddbdec4532b518a7b38ca73513";
 
         //_apiUrl: The base URL for the API. Find out what this is for other APIs via the API documentation
         public const string _apiUrl = "https://api.projectoxford.ai/emotion/v1.0/recognize";
 
         IApplicationEnvironment hostingEnvironment;
-        public HomeController(IApplicationEnvironment _hostingEnvironment)
+        AzureAppSettings options;
+        DayOfWeekStore dayOfWeekStore;
+        DateExtractor dateExtractor;
+
+        public HomeController(IApplicationEnvironment _hostingEnvironment, IOptions<AzureAppSettings> _options, DayOfWeekStore _dayOfWeekStore, DateExtractor _dateExtractor)
         {
             hostingEnvironment = _hostingEnvironment;
+            options = _options.Value;
+            dayOfWeekStore = _dayOfWeekStore;
+            dateExtractor = _dateExtractor;
         }
 
 
@@ -82,14 +92,43 @@ namespace HowHappy_Web.Controllers
             base64Image = "data:image/png;base64," + FileToBase64String(file);
 
             //create view model
+            var dateTaken = dateExtractor.ReadDateFromImage(file);
             var vm = new ResultViewModel()
             {
                 Faces = facesSorted,
-                ImagePath = base64Image
+                ImagePath = base64Image,
+                DateTaken = dateTaken?.ToShortDateString()
             };
+
+            WeekSummary summary;
+            if (dateTaken != null)
+                summary = dayOfWeekStore.SaveHappinessForEachFace(facesSorted, dateTaken.Value.DayOfWeek);
+            else
+                summary = dayOfWeekStore.ReadCurrentSummary(); // Picture does not have a date, just return the current summary.
+            vm.HappinessSummary = SummariseDayHappinessRatings(summary);
 
             //return view
             return View(vm);
+        }
+
+        private string SummariseDayHappinessRatings(WeekSummary summary)
+        {
+            var dayTotals = new Dictionary<DayOfWeek, int>();
+            foreach (var day in summary)
+            {
+                if (day.HappinessScores.Count == 0)
+                    continue;
+                double runningTotal = 0;
+                int faceCount = day.HappinessScores.Sum(h => h.Value);
+
+                foreach (var happinessValue in day.HappinessScores)
+                    runningTotal += (happinessValue.Key + 1) * happinessValue.Value;
+
+                dayTotals.Add(day.DayOfWeek, (int)(runningTotal / faceCount));
+            }
+            if (dayTotals.Count == 0)
+                return "We don't have enough data to show which days are happiest, is the Azure blob storage connection string set?";
+            return string.Join(",", dayTotals.OrderBy(t => t.Value).Select(t => $"{t.Key}: {t.Value}"));
         }
 
         public IActionResult Error()

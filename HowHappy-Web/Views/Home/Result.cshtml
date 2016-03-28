@@ -6,6 +6,8 @@
     <div class="col-md-12">
         <h1>Who was the happiest?</h1>
         <p>We found <strong>@Model.Faces.Count</strong> faces</p>
+        <p>Date taken: @(string.IsNullOrWhiteSpace(Model.DateTaken) ? "No date found in image" : Model.DateTaken)</p>
+        <p>The happiest days, from happiest to most miserable: @Model.HappinessSummary</p>
         <i id="spinner" class="fa fa-circle-o-notch fa-spin fa-5x"></i>
         <div id="cont">
             <div id="draggable">

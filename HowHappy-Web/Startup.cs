@@ -7,6 +7,8 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using HowHappy_Web.Models;
+using HowHappy_Web.Logic;
 
 namespace HowHappy_Web
 {
@@ -17,6 +19,7 @@ namespace HowHappy_Web
             // Set up configuration sources.
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
@@ -26,6 +29,11 @@ namespace HowHappy_Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AzureAppSettings>(Configuration);
+
+            services.AddScoped<DayOfWeekStore>();
+            services.AddScoped<DateExtractor>();
+
             // Add framework services.
             services.AddMvc();
         }
